@@ -6,11 +6,9 @@ import Link from 'next/link'
 import { api } from '~/utils/api'
 
 const Home: NextPage = () => {
-  const { data } = api.example.getAll.useQuery()
-
   const user = useUser()
 
-  console.log(data)
+  const { data } = api.posts.getAll.useQuery()
 
   return (
     <>
@@ -25,6 +23,11 @@ const Home: NextPage = () => {
           {!user.isSignedIn && <SignInButton />}
           {!!user.isSignedIn && <SignOutButton />}
         </div>
+        <ul>
+          {data?.map((post) => (
+            <li key={post.id}>{post.content}</li>
+          ))}
+        </ul>
       </main>
     </>
   )
