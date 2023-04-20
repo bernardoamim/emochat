@@ -1,9 +1,61 @@
-import { SignIn, SignInButton, SignOutButton, useUser } from '@clerk/nextjs'
+import { SignInButton, useUser } from '@clerk/nextjs'
 import { type NextPage } from 'next'
 import Head from 'next/head'
-import Link from 'next/link'
 
-import { api } from '~/utils/api'
+import { type RouterOutputs, api } from '~/utils/api'
+
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import Image from 'next/image'
+
+dayjs.extend(relativeTime)
+
+const CreatePostWizard = () => {
+  const { user } = useUser()
+
+  if (!user) return null
+
+  return (
+    <div className="flex w-full gap-3">
+      <Image
+        width={56}
+        height={56}
+        src={user.profileImageUrl}
+        alt="Profile Image"
+        className="rounded-full"
+      />
+      <input
+        type="text"
+        placeholder="How are you feeling?"
+        className="p grow bg-transparent outline-none"
+      />
+    </div>
+  )
+}
+
+type PostWithUser = RouterOutputs['posts']['getAll'][number]
+const PostView = ({ post, author }: PostWithUser) => {
+  return (
+    <li key={post.id} className="flex gap-3 border-b border-slate-400 p-4">
+      <Image
+        width={56}
+        height={56}
+        src={author.profileImageUrl}
+        alt="User Profile Image"
+        className="rounded-full"
+      />
+      <div className="flex flex-col text-slate-200">
+        <div className="flex gap-1">
+          <span>{`@${author.username}`}</span>
+          <span className="font-thin">{` - ${dayjs(
+            post.createdAt,
+          ).fromNow()}`}</span>
+        </div>
+        <span>{post.content}</span>
+      </div>
+    </li>
+  )
+}
 
 const Home: NextPage = () => {
   const user = useUser()
@@ -28,13 +80,11 @@ const Home: NextPage = () => {
                 <SignInButton />
               </div>
             )}
-            {!!user.isSignedIn && <SignOutButton />}
+            {user.isSignedIn && <CreatePostWizard />}
           </div>
           <ul className="flex flex-col">
-            {[...data, ...data]?.map((post) => (
-              <li key={post.id} className="border-b border-slate-400 p-8">
-                {post.content}
-              </li>
+            {[...data, ...data]?.map((fullPost) => (
+              <PostView {...fullPost} key={fullPost.post.id} />
             ))}
           </ul>
         </div>

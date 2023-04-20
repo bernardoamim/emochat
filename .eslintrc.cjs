@@ -29,6 +29,7 @@ const config = {
         fixStyle: "inline-type-imports",
       },
     ],
+    "no-unused-vars": [ "warn", { argsIgnorePattern: "^_" } ],
     "@typescript-eslint/no-unused-vars": [ "warn", { argsIgnorePattern: "^_" } ],
     "object-curly-spacing": [ "warn", "always" ],
     "array-bracket-spacing": [ "warn", "always" ]
